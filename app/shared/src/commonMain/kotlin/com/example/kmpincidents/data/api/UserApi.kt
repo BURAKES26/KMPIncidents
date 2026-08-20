@@ -1,0 +1,83 @@
+package com.example.kmpincidents.data.api
+
+import com.example.kmpincidents.data.model.*
+import com.example.kmpincidents.data.store.TokenPreferences
+import com.example.kmpincidents.util.performRequest
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+
+class UserApi(
+    private val client: HttpClient,
+    private val tokenPreferences: TokenPreferences
+) {
+    private val baseUrl = "http://10.0.2.2:8080/api/users"
+
+    // Public endpoint
+    suspend fun register(
+        username: String,
+        password: String,
+        email: String,
+        avatar: String?
+    ): ApiResult<Unit> =
+        performRequest(tokenPreferences, requiresAuth = false) { _ ->
+            client.post("$baseUrl/register") {
+                contentType(ContentType.Application.Json)
+                setBody(RegisterRequest(username, password, email, avatar))
+            }
+        }
+
+    suspend fun getCurrentUser(): ApiResult<UserResponse> =
+        performRequest(tokenPreferences) { token ->
+            client.get("$baseUrl/me") {
+                header("Authorization", "Bearer $token")
+            }
+        }
+
+    suspend fun updateCurrentUser(updateRequest: UpdateUserRequest): ApiResult<UserResponse> =
+        performRequest(tokenPreferences) { token ->
+            client.put("$baseUrl/me") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(updateRequest)
+            }
+        }
+
+    suspend fun getAllUsers(): ApiResult<List<UserResponse>> =
+        performRequest(tokenPreferences) { token ->
+            client.get(baseUrl) {
+                header("Authorization", "Bearer $token")
+            }
+        }
+
+    suspend fun getUserById(id: Long): ApiResult<UserResponse> =
+        performRequest(tokenPreferences) { token ->
+            client.get("$baseUrl/$id") {
+                header("Authorization", "Bearer $token")
+            }
+        }
+
+    suspend fun updateUserRole(id: Long, role: Role): ApiResult<UserResponse> {
+        return performRequest(tokenPreferences) { token ->
+            client.put("$baseUrl/$id/role") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(RoleUpdateRequest(role))
+            }
+        }
+    }
+
+    suspend fun deleteUser(id: Long): ApiResult<Unit> =
+        performRequest(tokenPreferences) { token ->
+            client.delete("$baseUrl/$id") {
+                header("Authorization", "Bearer $token")
+            }
+        }
+
+    suspend fun getUserIncidents(id: Long): ApiResult<List<IncidentResponse>> =
+        performRequest(tokenPreferences) { token ->
+            client.get("$baseUrl/$id/incidents") {
+                header("Authorization", "Bearer $token")
+            }
+        }
+}
