@@ -1,6 +1,7 @@
 package com.example.kmpincidents.data.api
 
-import com.example.kmpincidents.data.model.VehicleInfoResponse
+import com.example.kmpincidents.data.model.VehicleInfo
+import com.example.kmpincidents.data.model.ApiResult
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -9,7 +10,7 @@ import io.ktor.http.*
 class VehicleApi(private val client: HttpClient) {
     private val baseUrl = "https://opendata.rdw.nl/api/odata/v4/m9d7-ebf2"
 
-    suspend fun getVehicleInfo(licensePlate: String): VehicleInfoResponse? {
+    suspend fun getVehicleInfo(licensePlate: String): ApiResult<VehicleInfo> {
         return try {
             val response = client.get(baseUrl) {
                 url {
@@ -19,13 +20,12 @@ class VehicleApi(private val client: HttpClient) {
                 }
             }
             if (response.status.isSuccess()) {
-                response.body<VehicleInfoResponse>()
+                ApiResult.Success(response.body<VehicleInfo>())
             } else {
-                null
+                ApiResult.HttpError(response.status.value, response.status.description)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            null
+            ApiResult.Unknown(e)
         }
     }
 }
