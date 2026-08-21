@@ -8,5 +8,6 @@ expect fun PlatformStatsChart(
     labels: List<String>,
     values: List<Int>,
     title: String,
+    columnName: String = "Label",
     modifier: Modifier = Modifier
 )

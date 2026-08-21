@@ -56,17 +56,6 @@ actual fun PlatformMapView(
         }
     }
 
-    val features = incidents.map { incident ->
-        Feature(
-            geometry = Point(Position(longitude = incident.longitude, latitude = incident.latitude)),
-            properties = JsonObject(emptyMap()),
-            id = JsonPrimitive(incident.id)
-        )
-    }
-    val source = rememberGeoJsonSource(
-        data = GeoJsonData.Features(FeatureCollection(features))
-    )
-
     MaplibreMap(
         modifier = modifier,
         cameraState = cameraState,
@@ -77,6 +66,17 @@ actual fun PlatformMapView(
             ClickResult.Pass
         }
     ) {
+        val features = incidents.map { incident ->
+            Feature(
+                geometry = Point(Position(longitude = incident.longitude, latitude = incident.latitude)),
+                properties = JsonObject(emptyMap()),
+                id = JsonPrimitive(incident.id)
+            )
+        }
+        val source = rememberGeoJsonSource(
+            data = GeoJsonData.Features(FeatureCollection(features))
+        )
+
         CircleLayer(
             id = "incidents-layer",
             source = source,

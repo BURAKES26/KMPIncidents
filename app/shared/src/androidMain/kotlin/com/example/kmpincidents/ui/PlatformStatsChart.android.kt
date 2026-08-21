@@ -15,15 +15,16 @@ actual fun PlatformStatsChart(
     labels: List<String>,
     values: List<Int>,
     title: String,
+    columnName: String,
     modifier: Modifier
 ) {
     val data = mapOf(
-        "Label" to labels,
+        columnName to labels,
         "Count" to values
     )
 
     val plot = letsPlot(data) +
-            geomBar(stat = Stat.identity) { x = "Label"; y = "Count"; fill = "Label" } +
+            geomBar(stat = Stat.identity) { x = columnName; y = "Count"; fill = columnName } +
             ggtitle(title) +
             theme(
                 axisTitle = elementBlank(),

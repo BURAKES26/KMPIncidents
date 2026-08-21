@@ -149,7 +149,7 @@ private fun RegisterContent(
 
                     if (uiState.state is RegisterState.Error) {
                         Text(
-                            text = (uiState.state as RegisterState.Error).message,
+                            text = uiState.state.message,
                             color = Color.Red,
                             fontSize = 14.sp,
                             textAlign = TextAlign.Center,

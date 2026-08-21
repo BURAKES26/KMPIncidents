@@ -9,16 +9,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
-import com.example.kmpincidents.generated.resources.Res
 import com.example.kmpincidents.generated.resources.*
 import com.example.kmpincidents.data.model.IncidentResponse
 import com.example.kmpincidents.navigation.*
-import com.example.kmpincidents.util.PlatformStatsChart
+import com.example.kmpincidents.ui.PlatformStatsChart
 import com.example.kmpincidents.ui.components.BottomNavBar
 import com.example.kmpincidents.viewmodel.StatsPeriod
 import com.example.kmpincidents.viewmodel.StatsViewModel
 import kotlinx.datetime.*
-import kotlinx.datetime.Clock
+import kotlin.time.Instant
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 @Composable
@@ -117,6 +116,7 @@ fun IncidentsByCategoryChart(incidents: List<IncidentResponse>) {
             labels = categoryCounts.keys.toList(),
             values = categoryCounts.values.toList(),
             title = "Incidents by Category",
+            columnName = "Category",
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -130,6 +130,7 @@ fun IncidentsByStatusChart(incidents: List<IncidentResponse>) {
             labels = statusCounts.keys.toList(),
             values = statusCounts.values.toList(),
             title = "Incidents by Status",
+            columnName = "Status",
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -143,11 +144,6 @@ private fun parseCreatedAt(raw: String): Instant {
 
 private val monthAbbrev = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 private val dayAbbrev = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-
-private fun hourLabel(instant: Instant, tz: TimeZone): String {
-    val hour = instant.toLocalDateTime(tz).hour
-    return "${hour.toString().padStart(2, '0')}:00"
-}
 
 private fun dayOfWeekLabel(instant: Instant, tz: TimeZone): String {
     // kotlinx.datetime.DayOfWeek.MONDAY has isoDayNumber == 1
@@ -178,7 +174,7 @@ fun IncidentsPerPeriodChart(incidents: List<IncidentResponse>, period: StatsPeri
                 StatsPeriod.WEEK -> createdAt > now.minus(1, DateTimeUnit.WEEK, tz)
                 StatsPeriod.MONTH -> createdAt > now.minus(1, DateTimeUnit.MONTH, tz)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -191,7 +187,7 @@ fun IncidentsPerPeriodChart(incidents: List<IncidentResponse>, period: StatsPeri
                 StatsPeriod.WEEK -> dayOfWeekLabel(createdAt, tz)
                 StatsPeriod.MONTH -> monthLabel(createdAt, tz)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             "Unknown"
         }
     }.mapValues { it.value.size }
@@ -207,6 +203,7 @@ fun IncidentsPerPeriodChart(incidents: List<IncidentResponse>, period: StatsPeri
             labels = allPossibleKeys,
             values = allPossibleKeys.map { groupedData[it] ?: 0 },
             title = "Incidents distribution (${period.name})",
+            columnName = "Period",
             modifier = Modifier.fillMaxSize()
         )
     }
