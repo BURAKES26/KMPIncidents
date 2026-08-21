@@ -50,7 +50,7 @@ import com.example.kmpincidents.data.model.IncidentResponse
 import com.example.kmpincidents.data.model.Priority
 import com.example.kmpincidents.data.model.Status
 import com.example.kmpincidents.navigation.IncidentListKey
-import com.example.kmpincidents.navigation.PlatformMapViewKey
+import com.example.kmpincidents.navigation.IncidentMapKey
 import com.example.kmpincidents.navigation.MyIncidentListKey
 import com.example.kmpincidents.navigation.StatsKey
 import com.example.kmpincidents.navigation.UserManagementKey
@@ -62,11 +62,13 @@ import com.example.kmpincidents.ui.icons.DeleteIcon
 import com.example.kmpincidents.util.IncidentDisplayHelper
 import com.example.kmpincidents.viewmodel.IncidentManagementViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import com.example.kmpincidents.generated.resources.Res
+import com.example.kmpincidents.generated.resources.*
 
 @Composable
 fun AllIncidentListScreen(
     onNavigateToDetail: (Long) -> Unit,
-    onNavigateToPlatformMapView: () -> Unit,
+    onNavigateToIncidentMap: () -> Unit,
     onNavigateToUserManagement: () -> Unit,
     onNavigateToMyIncidentList: () -> Unit,
     onNavigateToStats: () -> Unit,
@@ -100,7 +102,7 @@ fun AllIncidentListScreen(
                 userRole = userRole,
                 onNavigateTo = { route ->
                     when (route) {
-                        PlatformMapViewKey -> onNavigateToPlatformMapView()
+                        IncidentMapKey -> onNavigateToIncidentMap()
                         UserManagementKey -> onNavigateToUserManagement()
                         MyIncidentListKey -> onNavigateToMyIncidentList()
                         StatsKey -> onNavigateToStats()

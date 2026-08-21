@@ -75,6 +75,7 @@ import com.example.kmpincidents.viewmodel.MyIncidentDetailViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun MyIncidentDetailScreen(
     onNavigateBack: () -> Unit,
@@ -396,12 +397,9 @@ private fun IncidentDetailContent(
             onDescriptionChange = onDescriptionChange
         )
         IncidentImagesCard(incident)
-        PlatformMapView(
-            modifier = Modifier.fillMaxSize(),
-            incidents = listOf(incident),
-            isLocationSelectionEnabled = true,
-            allowDetailNavigation = false,
-            onMapTouch = { isTouchingMap -> onParentScrollEnabledChange(!isTouchingMap) },
+        IncidentLocationCard(
+            incident = incident,
+            onParentScrollEnabledChange = { parentScrollEnabled = it },
             onLocationSelected = onLocationSelected
         )
 
@@ -835,7 +833,7 @@ private fun IncidentImagesCard(incident: IncidentResponse) {
 private fun IncidentLocationCard(
     incident: IncidentResponse,
     onParentScrollEnabledChange: (Boolean) -> Unit,
-    onLocationSelected: (Double, Double) -> Unit // Add this parameter
+    onLocationSelected: (Double, Double) -> Unit
 ) {
 
     Card(

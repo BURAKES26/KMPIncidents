@@ -8,19 +8,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 actual class PhotoPicker(
-    private val onLaunchGallery: () -> Unit,
-    private val onLaunchCamera: () -> Unit
+    private val launchCamera: (Uri) -> Unit,
+    private val launchGallery: () -> Unit,
+    private val pendingCameraUri: () -> Uri?
 ) {
-    actual fun pickFromGallery() = onLaunchGallery()
-    actual fun pickFromCamera() = onLaunchCamera()
+    actual fun pickFromCamera() {
+        pendingCameraUri()?.let { launchCamera(it) }
+    }
+
+    actual fun pickFromGallery() {
+        launchGallery()
+    }
 }
 
 @Composable
 actual fun rememberPhotoPicker(onPhotoPicked: (String) -> Unit): PhotoPicker {
     val context = LocalContext.current
-    var cameraUri = remember { mutableStateOf<Uri?>(null) }
+    var pendingUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            pendingUri?.let { onPhotoPicked(it.toString()) }
+        }
+    }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -28,28 +44,11 @@ actual fun rememberPhotoPicker(onPhotoPicked: (String) -> Unit): PhotoPicker {
         uri?.let { onPhotoPicked(it.toString()) }
     }
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success: Boolean ->
-        if (success) {
-            cameraUri.value?.let { onPhotoPicked(it.toString()) }
-        }
-    }
-
     return remember {
         PhotoPicker(
-            onLaunchGallery = {
-                galleryLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                )
-            },
-            onLaunchCamera = {
-                val uri = PhotoUtils.createImageUri(context)
-                cameraUri.value = uri
-                if (uri != null) {
-                    cameraLauncher.launch(uri)
-                }
-            }
+            launchCamera = { uri -> pendingUri = uri; cameraLauncher.launch(uri) },
+            launchGallery = { galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+            pendingCameraUri = { PhotoUtils.createImageUri(context)?.also { pendingUri = it } }
         )
     }
 }

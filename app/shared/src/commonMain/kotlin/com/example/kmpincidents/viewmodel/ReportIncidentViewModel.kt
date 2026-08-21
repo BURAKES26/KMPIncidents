@@ -37,11 +37,104 @@ class ReportIncidentViewModel(
     private val _uiState = MutableStateFlow(ReportIncidentUiState())
     val uiState = _uiState.asStateFlow()
 
-    // ... copy updateCategory / updateDescription / updateLicensePlateNumber / searchVehicleInfo /
-    // dismissVehicleInfoDialog / addPhoto / removePhoto / updateLocation / clearLocation /
-    // showLocationError / requestUseCurrentLocation / onLocationPermissionHandled /
-    // onCurrentLocationUsed / showImageSourceDialog / dismissImageSourceDialog /
-    // dismissPermissionWarning / onPhotoPermissionResult UNCHANGED from your original file ...
+    fun updateCategory(category: IncidentCategory) {
+        _uiState.update {
+            it.copy(
+                selectedCategory = category,
+                licensePlateNumber = if (category != IncidentCategory.TRAFFIC) "" else it.licensePlateNumber,
+                vehicleInfo = if (category != IncidentCategory.TRAFFIC) null else it.vehicleInfo
+            )
+        }
+    }
+
+    fun updateDescription(description: String) {
+        _uiState.update { it.copy(description = description) }
+    }
+
+    fun updateLicensePlateNumber(plateNumber: String) {
+        _uiState.update { it.copy(licensePlateNumber = plateNumber, vehicleInfo = null) }
+    }
+
+    fun searchVehicleInfo() {
+        val plate = _uiState.value.licensePlateNumber
+        if (plate.length != 6 || !plate.all { it.isLetterOrDigit() }) {
+            _uiState.update { it.copy(errorMessage = "License plate number must be 6 characters long and alphanumeric") }
+            return
+        }
+
+        viewModelScope.launch {
+            withLoading {
+                try {
+                    when (val result = vehicleApi.getVehicleInfo(plate)) {
+                        is ApiResult.Success -> _uiState.update {
+                            it.copy(vehicleInfo = result.data, showVehicleInfoDialog = true, errorMessage = null)
+                        }
+                        is ApiResult.HttpError -> _uiState.update { it.copy(errorMessage = "Vehicle not found: ${result.message}") }
+                        is ApiResult.NetworkError -> _uiState.update { it.copy(errorMessage = "Network error while searching vehicle") }
+                        is ApiResult.Timeout -> _uiState.update { it.copy(errorMessage = "Vehicle search timed out") }
+                        is ApiResult.Unknown -> _uiState.update { it.copy(errorMessage = "Unexpected error while searching vehicle") }
+                        is ApiResult.Unauthorized -> Unit
+                    }
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(errorMessage = "Unexpected error: ${e.message ?: "Please try again"}") }
+                }
+            }
+        }
+    }
+
+    fun dismissVehicleInfoDialog() {
+        _uiState.update { it.copy(showVehicleInfoDialog = false) }
+    }
+
+    fun addPhoto(photoUriString: String) {
+        _uiState.update { it.copy(photos = it.photos + photoUriString) }
+    }
+
+    fun removePhoto(photoUriString: String) {
+        _uiState.update { it.copy(photos = it.photos - photoUriString) }
+    }
+
+    fun updateLocation(latitude: Double, longitude: Double) {
+        _uiState.update { it.copy(latitude = latitude, longitude = longitude, errorMessage = null) }
+    }
+
+    fun clearLocation() {
+        _uiState.update { it.copy(latitude = null, longitude = null) }
+    }
+
+    fun showLocationError(message: String) {
+        _uiState.update { it.copy(errorMessage = message) }
+    }
+
+    fun requestUseCurrentLocation() {
+        _uiState.update { it.copy(shouldRequestLocationPermission = true, shouldUseCurrentLocation = true) }
+    }
+
+    fun onLocationPermissionHandled() {
+        _uiState.update { it.copy(shouldRequestLocationPermission = false) }
+    }
+
+    fun onCurrentLocationUsed() {
+        _uiState.update { it.copy(shouldUseCurrentLocation = false) }
+    }
+
+    fun showImageSourceDialog() {
+        _uiState.update { it.copy(showImageSourceDialog = true) }
+    }
+
+    fun dismissImageSourceDialog() {
+        _uiState.update { it.copy(showImageSourceDialog = false) }
+    }
+
+    fun dismissPermissionWarning() {
+        _uiState.update { it.copy(showPermissionDeniedWarning = false) }
+    }
+
+    fun onPhotoPermissionResult(granted: Boolean) {
+        if (!granted) {
+            _uiState.update { it.copy(showPermissionDeniedWarning = true, showImageSourceDialog = false) }
+        }
+    }
 
     fun submitReport() {
         val state = _uiState.value

@@ -11,7 +11,7 @@ plugins {
 
 compose.resources {
     publicResClass = true
-    packageOfResClass = "com.example.kmpincidents.generated.resources.Res"
+    packageOfResClass = "com.example.kmpincidents.generated.resources"
 }
 
 kotlin {

@@ -24,7 +24,7 @@ import com.example.kmpincidents.data.model.Priority
 import com.example.kmpincidents.data.model.Role
 import com.example.kmpincidents.data.model.Status
 import com.example.kmpincidents.navigation.IncidentListKey
-import com.example.kmpincidents.navigation.PlatformMapViewKey
+import com.example.kmpincidents.navigation.IncidentMapKey
 import com.example.kmpincidents.navigation.MyIncidentListKey
 import com.example.kmpincidents.navigation.StatsKey
 import com.example.kmpincidents.navigation.UserManagementKey
@@ -37,7 +37,7 @@ import com.example.kmpincidents.viewmodel.IncidentManagementViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun PlatformMapViewScreen(
+fun IncidentMapScreen(
     onNavigateToDetail: (Long) -> Unit,
     onNavigateToMyIncidentList: () -> Unit,
     onNavigateToIncidentList: () -> Unit,
@@ -113,7 +113,7 @@ private fun PlatformMapViewContent(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             BottomNavBar(
-                currentKey = PlatformMapViewKey,
+                currentKey = IncidentMapKey,
                 userRole = userRole,
                 onNavigateTo = { route ->
                     when (route) {

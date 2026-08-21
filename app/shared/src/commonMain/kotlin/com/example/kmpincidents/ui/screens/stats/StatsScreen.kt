@@ -10,19 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import com.example.kmpincidents.generated.resources.Res
-import com.example.kmpincidents.generated.resources.stats
+import com.example.kmpincidents.generated.resources.*
 import com.example.kmpincidents.data.model.IncidentResponse
 import com.example.kmpincidents.navigation.*
 import com.example.kmpincidents.util.PlatformStatsChart
 import com.example.kmpincidents.ui.components.BottomNavBar
 import com.example.kmpincidents.viewmodel.StatsPeriod
 import com.example.kmpincidents.viewmodel.StatsViewModel
+import kotlinx.datetime.*
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 @Composable
@@ -172,7 +168,7 @@ private fun monthDayLabel(instant: Instant, tz: TimeZone): String {
 @Composable
 fun IncidentsPerPeriodChart(incidents: List<IncidentResponse>, period: StatsPeriod) {
     val tz = TimeZone.currentSystemDefault()
-    val now = Clock.System.now()
+    val now = kotlin.time.Clock.System.now()
 
     val filteredIncidents = incidents.filter {
         try {

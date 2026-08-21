@@ -72,7 +72,10 @@ import com.example.kmpincidents.util.IncidentDisplayHelper.formatDateForDisplay
 import com.example.kmpincidents.util.IncidentDisplayHelper.getStatusColor
 import com.example.kmpincidents.viewmodel.IncidentDetailViewModel
 import org.koin.compose.viewmodel.koinViewModel
-
+import com.example.kmpincidents.generated.resources.Res
+import com.example.kmpincidents.generated.resources.*
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun IncidentDetailScreen(
@@ -284,6 +287,7 @@ private fun FullscreenImageDialog(
         }
     }
 }
+
 
 @Composable
 private fun IncidentManagementContent(
@@ -578,10 +582,11 @@ private fun IncidentManagementHeaderCard(
                     date = formatDateForDisplay(incident.dueAt)
                 )
 
-                if (incident.completedAt != null) {
+                val completedAt = incident.completedAt
+                if (completedAt != null) {
                     DateInfoRow(
                         label = stringResource(Res.string.completed),
-                        date = formatDateForDisplay(incident.completedAt),
+                        date = formatDateForDisplay(completedAt),
                         icon = CheckCircleIcon
                     )
                 }
@@ -1026,11 +1031,9 @@ private fun IncidentLocationCard(
                 PlatformMapView(
                     modifier = Modifier.fillMaxSize(),
                     incidents = listOf(incident),
-                    isLocationSelectionEnabled = true, // Always enabled
+                    isLocationSelectionEnabled = true,
                     allowDetailNavigation = false,
-                    onMapTouch = { isTouchingMap ->
-                        onParentScrollEnabledChange(!isTouchingMap)
-                    },
+                    onMapTouch = { isTouchingMap -> onParentScrollEnabledChange(!isTouchingMap) },
                     onLocationSelected = onLocationSelected
                 )
             }

@@ -30,4 +30,4 @@ fun IncidentsComposeTheme(
         typography = Typography,
         content = content
     )
-}}
+}

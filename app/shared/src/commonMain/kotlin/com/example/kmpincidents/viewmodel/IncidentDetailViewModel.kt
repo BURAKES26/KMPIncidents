@@ -50,8 +50,10 @@ class IncidentDetailViewModel(
                     is ApiResult.Success -> {
                         val incident = result.data
                         _uiState.value = _uiState.value.copy(currentIncident = incident)
-                        if (!incident.isAnonymous && incident.reportedBy != null) {
-                            fetchReportedUser(incident.reportedBy)
+                        if (!incident.isAnonymous) {
+                            incident.reportedBy?.let { reportedByUserId ->
+                                fetchReportedUser(reportedByUserId)
+                            }
                         }
                     }
                     is ApiResult.Unauthorized -> _uiState.value = _uiState.value.copy(unauthorizedState = true)

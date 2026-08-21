@@ -14,15 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kmpincidents.generated.resources.Res
-import com.example.kmpincidents.generated.resources.search_incidents
-import com.example.kmpincidents.generated.resources.search
-import com.example.kmpincidents.generated.resources.filter
-import com.example.kmpincidents.generated.resources.filter_incidents
-import com.example.kmpincidents.generated.resources.apply
-import com.example.kmpincidents.generated.resources.clear_all
-import com.example.kmpincidents.generated.resources.priority_lowercase
-import com.example.kmpincidents.generated.resources.status_lowercase
-import com.example.kmpincidents.generated.resources.category_lowercase
+import com.example.kmpincidents.generated.resources.*
 import com.example.kmpincidents.data.model.Priority
 import com.example.kmpincidents.data.model.Status
 import com.example.kmpincidents.data.model.IncidentCategory
@@ -79,11 +71,11 @@ private fun SearchTextField(
         value = query,
         onValueChange = onQueryChange,
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text(stringResource(R.string.search_incidents)) },
+        placeholder = { Text(stringResource(Res.string.search_incidents)) },
         leadingIcon = {
             Icon(
                 imageVector = SearchIcon,
-                contentDescription = stringResource(R.string.search)
+                contentDescription = stringResource(Res.string.search)
             )
         },
         singleLine = true,
@@ -108,7 +100,7 @@ private fun FilterIconButton(
     ) {
         Icon(
             imageVector = if (hasActiveFilters) FilterListFilledIcon else FilterListIcon,
-            contentDescription = stringResource(R.string.filter),
+            contentDescription = stringResource(Res.string.filter),
             tint = if (hasActiveFilters) MaterialTheme.colorScheme.onPrimary
             else MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -128,7 +120,7 @@ fun FilterDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.filter_incidents)) },
+        title = { Text(stringResource(Res.string.filter_incidents)) },
         text = {
             FilterDialogContent(
                 selectedPriority = selectedPriority,
@@ -141,7 +133,7 @@ fun FilterDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.apply))
+                Text(stringResource(Res.string.apply))
             }
         },
         dismissButton = {
@@ -149,7 +141,7 @@ fun FilterDialog(
                 onClearAll()
                 onDismiss()
             }) {
-                Text(stringResource(R.string.clear_all))
+                Text(stringResource(Res.string.clear_all))
             }
         }
     )
@@ -169,7 +161,7 @@ private fun FilterDialogContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         FilterSection(
-            title = stringResource(R.string.priority_lowercase),
+            title = stringResource(Res.string.priority_lowercase),
             options = Priority.entries,
             selectedOptions = selectedPriority,
             onOptionsSelected = { onUpdatePriority(it.toSet()) }
@@ -178,7 +170,7 @@ private fun FilterDialogContent(
         HorizontalDivider()
 
         FilterSection(
-            title = stringResource(R.string.status_lowercase),
+            title = stringResource(Res.string.status_lowercase),
             options = Status.entries,
             selectedOptions = selectedStatus,
             onOptionsSelected = { onUpdateStatus(it.toSet()) }
@@ -187,7 +179,7 @@ private fun FilterDialogContent(
         HorizontalDivider()
 
         FilterSection(
-            title = stringResource(R.string.category_lowercase),
+            title = stringResource(Res.string.category_lowercase),
             options = IncidentCategory.entries,
             selectedOptions = selectedCategory,
             onOptionsSelected = { onUpdateCategory(it.toSet()) }

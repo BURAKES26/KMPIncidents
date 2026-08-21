@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.letsPlot.compose.PlotPanel
 import org.jetbrains.letsPlot.geom.geomBar
-import org.jetbrains.letsPlot.ggtitle
+import org.jetbrains.letsPlot.label.ggtitle
 import org.jetbrains.letsPlot.letsPlot
 import org.jetbrains.letsPlot.Stat
 
@@ -29,6 +29,7 @@ actual fun PlatformStatsChart(
 
     PlotPanel(
         figure = fig,
-        modifier = modifier
+        modifier = modifier,
+        computationMessagesHandler = { }
     )
 }
