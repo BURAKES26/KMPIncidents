@@ -2,6 +2,7 @@ package com.example.kmpincidents.data.api
 
 import com.example.kmpincidents.data.model.*
 import com.example.kmpincidents.data.store.TokenPreferences
+import com.example.kmpincidents.util.backendHost
 import com.example.kmpincidents.util.performRequest
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -11,7 +12,7 @@ class UserApi(
     private val client: HttpClient,
     private val tokenPreferences: TokenPreferences
 ) {
-    private val baseUrl = "http://10.0.2.2:8080/api/users"
+    private val baseUrl = "http://$backendHost:8080/api/users"
 
     // Public endpoint
     suspend fun register(

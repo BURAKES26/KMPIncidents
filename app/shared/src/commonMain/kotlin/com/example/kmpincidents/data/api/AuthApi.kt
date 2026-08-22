@@ -2,13 +2,14 @@ package com.example.kmpincidents.data.api
 
 import com.example.kmpincidents.data.model.ApiResult
 import com.example.kmpincidents.data.model.LoginRequest
+import com.example.kmpincidents.util.backendHost
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 
 class AuthApi(private val client: HttpClient) {
-    private val baseUrl = "http://10.0.2.2:8080/api/auth"
+    private val baseUrl = "http://$backendHost:8080/api/auth"
 
     suspend fun login(username: String, password: String): ApiResult<String> {
         return try {

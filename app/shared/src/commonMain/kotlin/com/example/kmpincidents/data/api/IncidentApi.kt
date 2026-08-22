@@ -2,17 +2,18 @@ package com.example.kmpincidents.data.api
 
 import com.example.kmpincidents.data.model.*
 import com.example.kmpincidents.data.store.TokenPreferences
+import com.example.kmpincidents.util.PlatformFile
+import com.example.kmpincidents.util.backendHost
 import com.example.kmpincidents.util.performRequest
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
-import java.io.File
 
 class IncidentApi(
     private val client: HttpClient,
     private val tokenPreferences: TokenPreferences,
-    private val baseUrl: String = "http://10.0.2.2:8080/api"
+    private val baseUrl: String = "http://$backendHost:8080/api"
 ) {
     suspend fun getMyIncidents(): ApiResult<List<IncidentResponse>> =
         performRequest(tokenPreferences) { token ->
@@ -101,10 +102,9 @@ class IncidentApi(
         }
 
     // Public: Upload image without authorization
-// Public: Upload image without authorization
     suspend fun uploadImageToIncident(
         incidentId: Long,
-        imageFile: File,
+        imageFile: PlatformFile,
         description: String = ""
     ): ApiResult<ImageUploadResponse> =
         performRequest(tokenPreferences, requiresAuth = false, optionalAuth = true) { token ->
@@ -135,7 +135,7 @@ class IncidentApi(
 
     suspend fun uploadMultipleImagesToIncident(
         incidentId: Long,
-        imageFiles: List<File>,
+        imageFiles: List<PlatformFile>,
         description: String = ""
     ): ApiResult<List<ImageUploadResponse>> =
         performRequest(tokenPreferences, requiresAuth = false, optionalAuth = true) { token ->
@@ -167,11 +167,14 @@ class IncidentApi(
             }
         }
 
-    private fun getContentTypeForFile(file: File): String = when (file.extension.lowercase()) {
-        "jpg", "jpeg" -> "image/jpeg"
-        "png" -> "image/png"
-        "gif" -> "image/gif"
-        "webp" -> "image/webp"
-        else -> "application/octet-stream"
+    private fun getContentTypeForFile(file: PlatformFile): String {
+        val extension = file.name.substringAfterLast('.', "").lowercase()
+        return when (extension) {
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "gif" -> "image/gif"
+            "webp" -> "image/webp"
+            else -> "application/octet-stream"
+        }
     }
 }

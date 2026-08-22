@@ -49,7 +49,7 @@ fun IncidentMapScreen(
     val unauthorizedState = uiState.unauthorizedState
     val userRole = uiState.userRole
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val filteredIncidents = uiState.filteredIncidents
+    val filteredIncidents = uiState.filteredAllIncidents
     val hasActiveFilters by remember { derivedStateOf { viewModel.hasActiveFilters } }
 
     // Refresh data each time user navigates back to this screen
@@ -110,7 +110,7 @@ private fun PlatformMapViewContent(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = androidx.compose.ui.graphics.Color.Transparent,
         bottomBar = {
             BottomNavBar(
                 currentKey = IncidentMapKey,
@@ -163,7 +163,7 @@ private fun PlatformMapViewContent(
                 onUpdateStatus = onUpdateStatus,
                 onUpdateCategory = onUpdateCategory,
                 onClearAll = onClearAllFilters,
-                onDismiss = { }
+                onDismiss = { showFilterDialog = false }
             )
         }
     }

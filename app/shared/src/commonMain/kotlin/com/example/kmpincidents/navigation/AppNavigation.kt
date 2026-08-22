@@ -2,10 +2,12 @@ package com.example.kmpincidents.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import androidx.savedstate.serialization.SavedStateConfiguration
 import com.example.kmpincidents.ui.screens.auth.LoginScreen
 import com.example.kmpincidents.ui.screens.auth.RegisterScreen
 import com.example.kmpincidents.ui.screens.auth.UserProfileScreen
@@ -17,10 +19,31 @@ import com.example.kmpincidents.ui.screens.management.IncidentMapScreen
 import com.example.kmpincidents.ui.screens.management.UserManagementScreen
 import com.example.kmpincidents.ui.screens.incidents.ReportIncidentScreen
 import com.example.kmpincidents.ui.screens.stats.StatsScreen
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
+
+private val navSavedStateConfiguration = SavedStateConfiguration {
+    serializersModule = SerializersModule {
+        polymorphic(NavKey::class) {
+            subclass(LoginKey::class)
+            subclass(MyIncidentListKey::class)
+            subclass(RegisterKey::class)
+            subclass(MyIncidentDetailKey::class)
+            subclass(ReportIncidentKey::class)
+            subclass(IncidentListKey::class)
+            subclass(IncidentMapKey::class)
+            subclass(UserManagementKey::class)
+            subclass(StatsKey::class)
+            subclass(UserProfileKey::class)
+            subclass(IncidentDetailKey::class)
+        }
+    }
+}
 
 @Composable
 fun AppNavigation() {
-    val backStack = rememberNavBackStack(LoginKey)
+    val backStack = rememberNavBackStack(navSavedStateConfiguration, LoginKey)
 
     NavDisplay(
         backStack = backStack,

@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KMPIncidents</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet"/>
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="mapbridge.js"></script>
 </head>
 <body style="text-align: center; align-content: center">
+<div id="maplibre-map-container"></div>
 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 50 50" role="presentation">
     <circle cx="25" cy="25" r="20" stroke="#ccc" stroke-width="4" fill="none"/>
     <circle cx="25" cy="25" r="20" stroke="#333" stroke-width="4" fill="none" stroke-linecap="round"

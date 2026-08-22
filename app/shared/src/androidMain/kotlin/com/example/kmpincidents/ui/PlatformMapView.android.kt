@@ -118,7 +118,7 @@ actual fun PlatformMapView(
                 } catch (_: Exception) {
                     // Silently fail for periodic updates
                 }
-                delay(1000)
+                delay(1.seconds)
             }
         }
     }
@@ -151,7 +151,7 @@ actual fun PlatformMapView(
     }
 
     Box(modifier = modifier) {
-        if (hasLocationPermission) {
+        if (hasLocationPermission || !isLocationSelectionEnabled) {
             MaplibreMap(
                 modifier = Modifier
                     .fillMaxSize()
@@ -260,7 +260,7 @@ actual fun PlatformMapView(
                     CircleLayer(id = "user-location-inner", source = source, radius = const(4.dp), color = const(Color.White))
                 }
             }
-        } else {
+        } else if (isLocationSelectionEnabled) {
             Column(
                 modifier = Modifier.fillMaxSize().background(Color.White).padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,

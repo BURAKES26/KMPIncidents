@@ -61,6 +61,20 @@ kotlin {
     }
 
     sourceSets {
+        val webMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.ktor.client.js)
+                implementation(libs.wrappers.browser)
+            }
+        }
+        jsMain {
+            dependsOn(webMain)
+        }
+        wasmJsMain {
+            dependsOn(webMain)
+        }
+
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
@@ -102,10 +116,6 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-
-        }
-        jsMain.dependencies {
-            implementation(libs.wrappers.browser)
         }
     }
 }

@@ -5,3 +5,26 @@ html, body {
     padding: 0;
     overflow: hidden;
 }
+
+#maplibre-map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    z-index: 0;
+    display: none;
+    pointer-events: auto;
+    overflow: hidden;
+}
+
+#maplibre-map-container .maplibregl-map {
+    width: 100%;
+    height: 100%;
+}
+
+/* Keep Compose UI above the map host by default; map is raised only while active */
+canvas {
+    position: relative;
+    z-index: 1;
+}

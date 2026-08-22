@@ -1,14 +1,14 @@
 package com.example.kmpincidents.util
 
 object ImageUrlHelper {
-    private const val BASE_URL = "http://10.0.2.2:8080"
+    private val baseUrl: String get() = "http://$backendHost:8080"
 
     fun getFullImageUrl(imagePath: String?): String? {
         if (imagePath.isNullOrBlank()) return null
         return if (imagePath.startsWith("http")) {
             imagePath
         } else {
-            "$BASE_URL/uploads/incidentsimages/$imagePath"
+            "$baseUrl/uploads/incidentsimages/$imagePath"
         }
     }
 }

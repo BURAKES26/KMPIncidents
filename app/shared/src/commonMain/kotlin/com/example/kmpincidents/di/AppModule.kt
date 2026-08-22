@@ -7,24 +7,24 @@ import com.example.kmpincidents.data.api.VehicleApi
 import com.example.kmpincidents.data.repository.AuthRepository
 import com.example.kmpincidents.data.repository.IncidentRepository
 import com.example.kmpincidents.data.repository.UserRepository
+import com.example.kmpincidents.data.store.IncidentDataStore
+import com.example.kmpincidents.data.store.TokenPreferences
+import com.example.kmpincidents.util.PhotoFileResolver
 import com.example.kmpincidents.viewmodel.*
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val networkModule = module {
     single {
-        HttpClient(CIO) {
-            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
-        }
+        createHttpClient(Json { ignoreUnknownKeys = true })
     }
 }
 
 val dataModule = module {
+    single { TokenPreferences() }
+    single { IncidentDataStore() }
+    single { PhotoFileResolver() }
     single { AuthApi(get()) }
     single { UserApi(get(), get()) }
     single { IncidentApi(get(), get()) }

@@ -2,7 +2,7 @@ package com.example.kmpincidents.data.repository
 
 import com.example.kmpincidents.data.api.IncidentApi
 import com.example.kmpincidents.data.model.*
-import java.io.File
+import com.example.kmpincidents.util.PlatformFile
 
 class IncidentRepository(private val incidentApi: IncidentApi) {
 
@@ -35,14 +35,14 @@ class IncidentRepository(private val incidentApi: IncidentApi) {
 
     suspend fun uploadImageToIncident(
         incidentId: Long,
-        imageFile: File,
+        imageFile: PlatformFile,
         description: String = ""
     ): ApiResult<ImageUploadResponse> =
         incidentApi.uploadImageToIncident(incidentId, imageFile, description) // can be unauthorized
 
     suspend fun uploadMultipleImagesToIncident(
         incidentId: Long,
-        imageFiles: List<File>,
+        imageFiles: List<PlatformFile>,
         description: String = ""
     ): ApiResult<List<ImageUploadResponse>> =
         incidentApi.uploadMultipleImagesToIncident(incidentId, imageFiles, description) // can be unauthorized

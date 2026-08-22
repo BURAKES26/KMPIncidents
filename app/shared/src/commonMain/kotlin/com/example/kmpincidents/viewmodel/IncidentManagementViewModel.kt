@@ -26,7 +26,8 @@ data class IncidentManagementUiState(
     val selectedPriorityFilter: Set<Priority> = emptySet(),
     val selectedStatusFilter: Set<Status> = emptySet(),
     val selectedCategoryFilter: Set<IncidentCategory> = emptySet(),
-    val filteredIncidents: List<IncidentResponse> = emptyList()
+    val filteredIncidents: List<IncidentResponse> = emptyList(),
+    val filteredAllIncidents: List<IncidentResponse> = emptyList()
 )
 
 class IncidentManagementViewModel(
@@ -158,14 +159,24 @@ class IncidentManagementViewModel(
 
     private fun applyFilters() {
         val state = _uiState.value
-        val filtered = IncidentFilterHelper.filterIncidents(
+        val filteredAll = IncidentFilterHelper.filterIncidents(
+            incidents = state.allIncidents,
+            searchQuery = state.searchQuery,
+            priorityFilter = state.selectedPriorityFilter,
+            statusFilter = state.selectedStatusFilter,
+            categoryFilter = state.selectedCategoryFilter
+        )
+        val filteredDisplayed = IncidentFilterHelper.filterIncidents(
             incidents = state.displayedIncidents,
             searchQuery = state.searchQuery,
             priorityFilter = state.selectedPriorityFilter,
             statusFilter = state.selectedStatusFilter,
             categoryFilter = state.selectedCategoryFilter
         )
-        _uiState.value = state.copy(filteredIncidents = filtered)
+        _uiState.value = state.copy(
+            filteredIncidents = filteredDisplayed,
+            filteredAllIncidents = filteredAll
+        )
     }
 
     fun updateSearchQuery(query: String) {
