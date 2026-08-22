@@ -4,5 +4,11 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>KMPIncidents needs camera access to take photos of reported incidents.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>KMPIncidents needs photo library access to attach photos to reported incidents.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>KMPIncidents needs your location to report and show incidents near you.</string>
 </dict>
 </plist>

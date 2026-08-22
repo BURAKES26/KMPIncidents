@@ -61,7 +61,7 @@ kotlin {
     }
 
     sourceSets {
-        val webMain by creating {
+        val webMain = create("webMain") {
             dependsOn(commonMain.get())
             dependencies {
                 implementation(libs.ktor.client.js)
