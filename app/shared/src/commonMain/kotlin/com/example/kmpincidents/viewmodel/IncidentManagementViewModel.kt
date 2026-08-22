@@ -219,6 +219,22 @@ class IncidentManagementViewModel(
 
     fun refreshIncidents() {
         currentDisplayCount = 0
-        loadAllIncidents()
+        loadAllIncidents(forceRefresh = true)
+    }
+
+    /**
+     * Patches a single incident in the already-loaded lists in place (e.g. after its
+     * priority/status was changed from a detail screen that doesn't trigger a full
+     * reload of this view model, such as the desktop master-detail home screen).
+     */
+    fun updateIncidentInList(updated: IncidentResponse) {
+        val state = _uiState.value
+        if (state.allIncidents.none { it.id == updated.id }) return
+
+        _uiState.value = state.copy(
+            allIncidents = state.allIncidents.map { if (it.id == updated.id) updated else it },
+            displayedIncidents = state.displayedIncidents.map { if (it.id == updated.id) updated else it }
+        )
+        applyFilters()
     }
 }

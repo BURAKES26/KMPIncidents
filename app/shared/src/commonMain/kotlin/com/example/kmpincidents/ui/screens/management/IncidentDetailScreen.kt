@@ -57,7 +57,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.example.kmpincidents.*
 import com.example.kmpincidents.data.model.IncidentResponse
 import com.example.kmpincidents.data.model.Priority
 import com.example.kmpincidents.data.model.Status
@@ -82,6 +81,7 @@ fun IncidentDetailScreen(
     onNavigateBack: () -> Unit,
     onNavigateToMyIncidentList: () -> Unit,
     incidentId: Long?,
+    onIncidentUpdated: (IncidentResponse) -> Unit = {},
     viewModel: IncidentDetailViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -95,7 +95,12 @@ fun IncidentDetailScreen(
 
     LaunchedEffect(incidentId) { if (incidentId != null) viewModel.getIncidentById(incidentId) }
     LaunchedEffect(uiState.unauthorizedState) { if (uiState.unauthorizedState) onNavigateToMyIncidentList() }
-    LaunchedEffect(uiState.currentIncident) { uiState.currentIncident?.let { selectedLocation = it.latitude to it.longitude } }
+    LaunchedEffect(uiState.currentIncident) {
+        uiState.currentIncident?.let {
+            selectedLocation = it.latitude to it.longitude
+            onIncidentUpdated(it)
+        }
+    }
 
     LaunchedEffect(uiState.toastMessage) {
         uiState.toastMessage?.let { message ->
@@ -209,7 +214,6 @@ fun IncidentDetailScreen(
                     IncidentManagementContent(
                         incident = incident,
                         reportedUser = uiState.reportedUser,
-                        selectedLocation = selectedLocation,
                         userFetchTimeout = uiState.userFetchTimeout,
                         onPriorityChange = { priority ->
                             viewModel.updatePriority(incident.id, priority)
@@ -294,7 +298,6 @@ private fun IncidentManagementContent(
     incident: IncidentResponse,
     reportedUser: com.example.kmpincidents.data.model.UserResponse?,
     userFetchTimeout: Boolean,
-    selectedLocation: Pair<Double, Double>?,
     onPriorityChange: (Priority) -> Unit,
     onStatusChange: (Status) -> Unit,
     onDelete: () -> Unit,
@@ -332,7 +335,6 @@ private fun IncidentManagementContent(
 
         IncidentLocationCard(
             incident = incident,
-            parentScrollEnabled = parentScrollEnabled,
             onParentScrollEnabledChange = { parentScrollEnabled = it },
             onLocationSelected = onLocationSelected,
             onSaveLocation = onSaveLocation
@@ -973,7 +975,6 @@ private fun IncidentImagesCard(
 @Composable
 private fun IncidentLocationCard(
     incident: IncidentResponse,
-    parentScrollEnabled: Boolean,
     onParentScrollEnabledChange: (Boolean) -> Unit,
     onLocationSelected: (Double, Double) -> Unit,
     onSaveLocation: () -> Unit

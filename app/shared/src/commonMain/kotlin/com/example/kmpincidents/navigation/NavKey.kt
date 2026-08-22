@@ -35,3 +35,6 @@ data class UserProfileKey(val userJson: String) : NavKey
 
 @Serializable
 data class IncidentDetailKey(val incidentId: Long) : NavKey
+
+@Serializable
+object DesktopHomeKey : NavKey

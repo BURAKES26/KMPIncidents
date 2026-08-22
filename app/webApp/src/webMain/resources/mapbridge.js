@@ -15,7 +15,10 @@
 
     var state = {
         map: null,
+        mapLoaded: false,
         incidentsById: {},
+        selectedLocation: null,
+        userLocation: null,
         onIncidentClick: null,
         onMapClick: null,
         locationSelectionEnabled: false,
@@ -51,9 +54,9 @@
 
         state.map.on("load", function () {
             var m = state.map;
-            m.addSource(SOURCE_ID, { type: "geojson", data: emptyFeatureCollection() });
-            m.addSource(SELECTED_SOURCE, { type: "geojson", data: emptyFeatureCollection() });
-            m.addSource(USER_SOURCE, { type: "geojson", data: emptyFeatureCollection() });
+            m.addSource(SOURCE_ID, { type: "geojson", data: incidentsFeatureCollection() });
+            m.addSource(SELECTED_SOURCE, { type: "geojson", data: state.selectedLocation ? pointFeatureCollection(state.selectedLocation.lon, state.selectedLocation.lat) : emptyFeatureCollection() });
+            m.addSource(USER_SOURCE, { type: "geojson", data: state.userLocation ? pointFeatureCollection(state.userLocation.lon, state.userLocation.lat) : emptyFeatureCollection() });
 
             m.addLayer({ id: LAYER_OUTER, type: "circle", source: SOURCE_ID, paint: { "circle-radius": 10, "circle-color": "#F44336", "circle-stroke-width": 2, "circle-stroke-color": "#FFFFFF" } });
             m.addLayer({ id: "incidents-inner", type: "circle", source: SOURCE_ID, paint: { "circle-radius": 4, "circle-color": "#FFFFFF" } });
@@ -81,7 +84,20 @@
 
             m.on("mouseenter", LAYER_OUTER, function () { m.getCanvas().style.cursor = "pointer"; });
             m.on("mouseleave", LAYER_OUTER, function () { m.getCanvas().style.cursor = ""; });
+
+            state.mapLoaded = true;
+            fitToIncidents(Object.keys(state.incidentsById).map(function (k) { return state.incidentsById[k]; }));
         });
+    }
+
+    function incidentsFeatureCollection() {
+        return {
+            type: "FeatureCollection",
+            features: Object.keys(state.incidentsById).map(function (k) {
+                var i = state.incidentsById[k];
+                return { type: "Feature", geometry: { type: "Point", coordinates: [i.lon, i.lat] }, properties: { id: String(i.id) } };
+            })
+        };
     }
 
     function fitToIncidents(incidents) {
@@ -141,7 +157,10 @@
             state.map.remove();
             state.map = null;
         }
+        state.mapLoaded = false;
         state.incidentsById = {};
+        state.selectedLocation = null;
+        state.userLocation = null;
         state.onIncidentClick = null;
         state.onMapClick = null;
     };
@@ -150,39 +169,38 @@
         var incidents = JSON.parse(json);
         state.incidentsById = {};
         incidents.forEach(function (i) { state.incidentsById[String(i.id)] = i; });
-        if (!state.map) return;
+        if (!state.map || !state.mapLoaded) return;
         var source = state.map.getSource(SOURCE_ID);
         if (source) {
-            source.setData({
-                type: "FeatureCollection",
-                features: incidents.map(function (i) {
-                    return { type: "Feature", geometry: { type: "Point", coordinates: [i.lon, i.lat] }, properties: { id: String(i.id) } };
-                })
-            });
+            source.setData(incidentsFeatureCollection());
         }
         fitToIncidents(incidents);
     };
 
     window.kmpMapUpdateSelectedLocation = function (lat, lon) {
-        if (!state.map) return;
+        state.selectedLocation = { lat: lat, lon: lon };
+        if (!state.map || !state.mapLoaded) return;
         var source = state.map.getSource(SELECTED_SOURCE);
         if (source) source.setData(pointFeatureCollection(lon, lat));
     };
 
     window.kmpMapClearSelectedLocation = function () {
-        if (!state.map) return;
+        state.selectedLocation = null;
+        if (!state.map || !state.mapLoaded) return;
         var source = state.map.getSource(SELECTED_SOURCE);
         if (source) source.setData(emptyFeatureCollection());
     };
 
     window.kmpMapUpdateUserLocation = function (lat, lon) {
-        if (!state.map) return;
+        state.userLocation = { lat: lat, lon: lon };
+        if (!state.map || !state.mapLoaded) return;
         var source = state.map.getSource(USER_SOURCE);
         if (source) source.setData(pointFeatureCollection(lon, lat));
     };
 
     window.kmpMapClearUserLocation = function () {
-        if (!state.map) return;
+        state.userLocation = null;
+        if (!state.map || !state.mapLoaded) return;
         var source = state.map.getSource(USER_SOURCE);
         if (source) source.setData(emptyFeatureCollection());
     };

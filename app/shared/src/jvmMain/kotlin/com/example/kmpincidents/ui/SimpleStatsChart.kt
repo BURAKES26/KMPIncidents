@@ -78,7 +78,6 @@ fun SimpleStatsChart(
                     val chartTop = size.height * 0.08f
                     val chartHeight = chartBottom - chartTop
 
-                    // baseline
                     drawLine(
                         color = Color.LightGray,
                         start = Offset(0f, chartBottom),

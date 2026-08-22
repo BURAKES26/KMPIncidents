@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 
 data class LoginUiState(
     val loginState: LoginState = LoginState.Idle,
@@ -68,6 +70,26 @@ class LoginViewModel(
 
     fun clearLoginState() {
         _uiState.update { it.copy(loginState = LoginState.Idle) }
+    }
+
+    /**
+     * Used by desktop (and other restricted clients) after a successful auth when the
+     * authenticated role is not allowed. Clears the persisted token and surfaces an error.
+     */
+    fun rejectAuthenticatedSession(string: StringResource) {
+        viewModelScope.launch {
+            try {
+                repository.logout()
+            } finally {
+                val message = getString(string)
+                _uiState.update {
+                    it.copy(
+                        loginState = LoginState.Error(message),
+                        autoLoginState = AutoLoginState.NoToken
+                    )
+                }
+            }
+        }
     }
 }
 

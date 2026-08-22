@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +32,7 @@ import com.example.kmpincidents.ui.components.FilterDialog
 import com.example.kmpincidents.util.PlatformMapView
 import com.example.kmpincidents.ui.components.LoadingOverlay
 import com.example.kmpincidents.ui.components.SearchAndFilterBar
+import com.example.kmpincidents.util.isWebPlatform
 import com.example.kmpincidents.viewmodel.IncidentManagementViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -54,7 +54,7 @@ fun IncidentMapScreen(
 
     // Refresh data each time user navigates back to this screen
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        viewModel.loadAllIncidents()
+        viewModel.loadAllIncidents(forceRefresh = true)
     }
 
     LaunchedEffect(unauthorizedState) {
@@ -107,6 +107,7 @@ private fun PlatformMapViewContent(
     onNavigateToStats: () -> Unit
 ) {
     var showFilterDialog by rememberSaveable { mutableStateOf(false) }
+    val showSearchAndFilter = !isWebPlatform
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -132,12 +133,14 @@ private fun PlatformMapViewContent(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            SearchAndFilterBar(
-                query = searchQuery,
-                onQueryChange = onSearchQueryChange,
-                hasActiveFilters = hasActiveFilters,
-                onFilterClick = { showFilterDialog = true }
-            )
+            if (showSearchAndFilter) {
+                SearchAndFilterBar(
+                    query = searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    hasActiveFilters = hasActiveFilters,
+                    onFilterClick = { showFilterDialog = true }
+                )
+            }
 
             Box(modifier = Modifier.fillMaxSize().weight(1f)) {
                 PlatformMapView(
@@ -154,7 +157,7 @@ private fun PlatformMapViewContent(
             LoadingOverlay(isLoading = isLoading)
         }
 
-        if (showFilterDialog) {
+        if (showSearchAndFilter && showFilterDialog) {
             FilterDialog(
                 selectedPriority = selectedPriority,
                 selectedStatus = selectedStatus,

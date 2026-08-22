@@ -27,7 +27,6 @@ class IncidentService(
         val foundIncident = incidentRepository.findById(incidentId)
         return if (foundIncident != null) {
             incidentRepository.delete(incidentId)
-            // also remove all images for this incident
             foundIncident.images.forEach { imagefile ->
                 val imageToDelete = Path(getImageUploadPath(imagefile))
                 deleteIfExists(imageToDelete)
@@ -37,13 +36,17 @@ class IncidentService(
     }
 
     suspend fun changeStatus(incident: Incident, status: Status): Incident {
-        val updatedIncident = if (status == Status.RESOLVED) {
-            incident.copy(
+            val updatedIncident = when (status) {
+            Status.RESOLVED -> incident.copy(
                 status = status,
-                completedAt = currentInstant()
+                completedAt = currentInstant(),
+                updatedAt = currentInstant()
             )
-        } else {
-            incident.copy(status = status)
+            Status.REPORTED, Status.ASSIGNED -> incident.copy(
+                status = status,
+                completedAt = null,
+                updatedAt = currentInstant()
+            )
         }
 
         return incidentRepository.save(updatedIncident)

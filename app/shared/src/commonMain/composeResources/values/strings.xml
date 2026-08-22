@@ -144,4 +144,5 @@
     <string name="USER">USER</string>
     <string name="OFFICIAL">OFFICIAL</string>
     <string name="ADMIN">ADMIN</string>
+    <string name="desktop_login_error">Only officials can access the desktop app</string>
 </resources>

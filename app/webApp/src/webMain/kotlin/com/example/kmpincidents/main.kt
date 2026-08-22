@@ -12,7 +12,7 @@ fun main() {
     startKoin {
         modules(networkModule, dataModule, viewModelModule)
     }
-    ComposeViewport {
+    ComposeViewport(viewportContainerId = "composeApplication") {
         App()
     }
 }

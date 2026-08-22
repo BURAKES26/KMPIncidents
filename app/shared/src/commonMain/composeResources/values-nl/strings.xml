@@ -144,4 +144,5 @@
     <string name="USER">GEBRUIKER</string>
     <string name="OFFICIAL">AMBTENAAR</string>
     <string name="ADMIN">BEHEERDER</string>
+    <string name="desktop_login_error">Alleen ambtenaren kunnen inloggen op de desktop app</string>
 </resources>
