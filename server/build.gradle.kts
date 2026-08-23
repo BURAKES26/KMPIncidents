@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.ktor.serverAuthJwt)
     implementation(libs.ktor.serverStatusPages)
     implementation(libs.ktor.serverContentNegotiation)
+    implementation(libs.ktor.serverSse)
     implementation(libs.ktor.serializationKotlinxJsonJvm)
 
     implementation(libs.kotlinx.datetime)

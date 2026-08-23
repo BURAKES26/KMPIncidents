@@ -16,14 +16,5 @@ fun Application.configureSecurity(
                 jwtService.customValidator(credential)
             }
         }
-
-        jwt("access-admin-only") {
-            realm = jwtService.jwtRealm
-            verifier(jwtService.jwtVerifier)
-
-            validate { credential ->
-                jwtService.customValidator(credential)
-            }
-        }
     }
 }

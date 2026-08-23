@@ -98,7 +98,7 @@ private fun topViewController(): UIViewController? {
     val keyWindow = application.keyWindow
         ?: application.windows
             .mapNotNull { it as? UIWindow }
-            .firstOrNull { it.isKeyWindow }
+            .firstOrNull { it.isKeyWindow() }
         ?: application.windows.mapNotNull { it as? UIWindow }.firstOrNull()
 
     var controller = keyWindow?.rootViewController

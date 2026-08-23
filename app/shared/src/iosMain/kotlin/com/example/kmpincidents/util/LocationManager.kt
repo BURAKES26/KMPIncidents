@@ -72,7 +72,7 @@ actual object LocationManager {
                         -> {
                             LocationRequestHolder.clear()
                             continuation.resume(
-                                Result.failure(SecurityException("Location permission not granted"))
+                                Result.failure(Exception("Location permission not granted"))
                             )
                         }
 
@@ -83,7 +83,7 @@ actual object LocationManager {
                         else -> {
                             LocationRequestHolder.clear()
                             continuation.resume(
-                                Result.failure(SecurityException("Location permission not granted"))
+                                Result.failure(Exception("Location permission not granted"))
                             )
                         }
                     }
@@ -108,7 +108,7 @@ actual object LocationManager {
                 else -> {
                     LocationRequestHolder.clear()
                     continuation.resume(
-                        Result.failure(SecurityException("Location permission not granted"))
+                        Result.failure(Exception("Location permission not granted"))
                     )
                 }
             }
@@ -126,7 +126,7 @@ actual object LocationManager {
             return@callbackFlow
         }
         if (!hasLocationPermission()) {
-            close(SecurityException("Location permission not granted"))
+            close(Exception("Location permission not granted"))
             return@callbackFlow
         }
 

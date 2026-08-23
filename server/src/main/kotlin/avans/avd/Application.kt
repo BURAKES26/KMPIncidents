@@ -19,6 +19,7 @@ import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.routing.*
+import io.ktor.server.sse.*
 import kotlinx.serialization.Serializable
 import java.io.File
 
@@ -56,6 +57,8 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
+
+    install(SSE)
 
     // Install route modules with explicit dependencies (no DI container)
     authModule(jwtService)

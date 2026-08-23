@@ -6,15 +6,38 @@ import com.example.kmpincidents.util.PlatformFile
 import com.example.kmpincidents.util.backendHost
 import com.example.kmpincidents.util.performRequest
 import io.ktor.client.*
+import io.ktor.client.plugins.sse.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
 class IncidentApi(
     private val client: HttpClient,
     private val tokenPreferences: TokenPreferences,
     private val baseUrl: String = "http://$backendHost:8080/api"
 ) {
+    private val eventJson = Json { ignoreUnknownKeys = true }
+
+    // Streams push notifications (incident updates) for incidents reported by the
+    // currently authenticated user, via Server-Sent Events. The returned Flow is cold:
+    // a new SSE connection is opened for each collector and reconnects on the caller's side.
+    fun observeIncidentNotifications(): Flow<IncidentResponse> = flow {
+        val token = tokenPreferences.getToken() ?: return@flow
+        client.sse(
+            urlString = "$baseUrl/incidents/notifications",
+            request = { header("Authorization", "Bearer $token") }
+        ) {
+            incoming.collect { event ->
+                event.data?.let { data ->
+                    emit(eventJson.decodeFromString<IncidentResponse>(data))
+                }
+            }
+        }
+    }
+
     suspend fun getMyIncidents(): ApiResult<List<IncidentResponse>> =
         performRequest(tokenPreferences) { token ->
             client.get("$baseUrl/incidents/my-incidents") {

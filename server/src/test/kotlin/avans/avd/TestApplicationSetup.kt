@@ -11,6 +11,7 @@ import avans.avd.users.UserService
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.sse.*
 
 /**
  * Common Ktor test application setup so tests don't repeat DI and plugin wiring.
@@ -30,6 +31,7 @@ fun Application.installTestModules() {
     )
 
     install(ContentNegotiation) { json() }
+    install(SSE)
 
     // Install routes and security commonly needed by tests
     authModule(jwtService)

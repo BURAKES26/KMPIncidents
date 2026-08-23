@@ -12,13 +12,35 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sse.*
+import io.ktor.sse.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
+import kotlinx.serialization.json.Json
 import java.io.File
 
 fun Route.incidentRoutes(
     incidentService: IncidentService
 ) {
+    // Stream incident change events (created/updated/deleted) as Server-Sent Events
+    sse("/events") {
+        incidentService.incidentEvents.collect { event ->
+            when (event) {
+                is IncidentEvent.Created -> send(
+                    ServerSentEvent(data = Json.encodeToString(event.incident.toResponse()), event = "created")
+                )
+
+                is IncidentEvent.Updated -> send(
+                    ServerSentEvent(data = Json.encodeToString(event.incident.toResponse()), event = "updated")
+                )
+
+                is IncidentEvent.Deleted -> send(
+                    ServerSentEvent(data = event.incidentId.toString(), event = "deleted")
+                )
+            }
+        }
+    }
+
     // Anyone may create an Incident, if anonymous the issuer cannot edit the Incident later.
     // When an authenticated user creates an Incident, the userId identifies the user who created this Incident
     authenticate(optional = true) {
@@ -208,7 +230,9 @@ fun Route.incidentRoutes(
                 updatedAt = currentInstant()
             )
 
-            val savedIncident = incidentService.save(updatedIncident)
+            // Notify the reporter only when the update was made by an official/admin,
+            // not when the reporter is updating their own report
+            val savedIncident = incidentService.save(updatedIncident, notifyReporter = isQualifiedOfficial())
             call.respond(HttpStatusCode.OK, savedIncident.toResponse())
         }
         // Endpoint to change incident priority (ADMIN/OFFICIAL only)
@@ -226,7 +250,8 @@ fun Route.incidentRoutes(
                 updatedAt = currentInstant()
             )
 
-            val savedIncident = incidentService.save(updatedIncident)
+            // Priority changes are only performed by officials/admins, so notify the reporter
+            val savedIncident = incidentService.save(updatedIncident, notifyReporter = true)
             call.respond(HttpStatusCode.OK, savedIncident.toResponse())
         }
 
@@ -242,6 +267,22 @@ fun Route.incidentRoutes(
 
             val updatedIncident = incidentService.changeStatus(foundIncident, changeStatusRequest.status)
             call.respond(HttpStatusCode.OK, updatedIncident.toResponse())
+        }
+
+        // Push notification stream for the current authenticated user: only delivers
+        // incident-updated events for incidents they reported, when updated by an official/admin
+        sse("/notifications") {
+            val userId = call.userId() ?: return@sse
+            incidentService.incidentEvents.collect { event ->
+                if (event is IncidentEvent.Updated && event.notifyReporter && event.incident.reportedBy == userId) {
+                    send(
+                        ServerSentEvent(
+                            data = Json.encodeToString(event.incident.toResponse()),
+                            event = "incident-updated"
+                        )
+                    )
+                }
+            }
         }
 
     }

@@ -1,12 +1,20 @@
 package avans.avd.incidents
 
 import avans.avd.utils.currentInstant
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.nio.file.Files.deleteIfExists
 import kotlin.io.path.Path
 
 class IncidentService(
     private val incidentRepository: IncidentRepository<Long>,
 ) {
+    private val _incidentEvents = MutableSharedFlow<IncidentEvent>(extraBufferCapacity = 64)
+
+    // Stream of incident change events that can be collected by SSE consumers
+    val incidentEvents: SharedFlow<IncidentEvent> = _incidentEvents.asSharedFlow()
+
     suspend fun findAll(): List<Incident> =
         incidentRepository.findAll()
 
@@ -20,8 +28,14 @@ class IncidentService(
     suspend fun findIncidentsReportedByUser(userId: Long): List<Incident> =
         incidentRepository.findIncidentsForUser(userId)
 
-    suspend fun save(incident: Incident): Incident =
-        incidentRepository.save(incident)
+    suspend fun save(incident: Incident, notifyReporter: Boolean = false): Incident {
+        val isNew = incident.id == Incident.NEW_INCIDENT_ID
+        val savedIncident = incidentRepository.save(incident)
+        _incidentEvents.emit(
+            if (isNew) IncidentEvent.Created(savedIncident) else IncidentEvent.Updated(savedIncident, notifyReporter)
+        )
+        return savedIncident
+    }
 
     suspend fun delete(incidentId: Long): Boolean {
         val foundIncident = incidentRepository.findById(incidentId)
@@ -31,6 +45,7 @@ class IncidentService(
                 val imageToDelete = Path(getImageUploadPath(imagefile))
                 deleteIfExists(imageToDelete)
             }
+            _incidentEvents.emit(IncidentEvent.Deleted(incidentId))
             true
         } else false
     }
@@ -49,7 +64,8 @@ class IncidentService(
             )
         }
 
-        return incidentRepository.save(updatedIncident)
+        // Status changes are only performed by officials/admins, so the reporter should be notified
+        return save(updatedIncident, notifyReporter = true)
     }
 
 
@@ -64,7 +80,7 @@ class IncidentService(
         )
 
         // Use specialized repository method with prepared entity
-        return incidentRepository.save( updatedIncident)
+        return save(updatedIncident)
     }
 
 

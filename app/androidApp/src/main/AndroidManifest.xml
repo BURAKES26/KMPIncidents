@@ -22,6 +22,13 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!-- Required on Android 13+ to show push notifications for incident updates -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Required to run the incident update listener as a foreground service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <application
             android:name=".MainApplication"
             android:allowBackup="true"
@@ -41,6 +48,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Keeps listening for incident updates while the app is closed / in the background -->
+        <service
+                android:name="com.example.kmpincidents.notification.IncidentNotificationService"
+                android:exported="false"
+                android:foregroundServiceType="dataSync" />
 
         <!-- FileProvider for Camera -->
         <provider

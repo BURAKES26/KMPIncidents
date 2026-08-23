@@ -47,8 +47,6 @@ class JwtService(
         .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000))
         .sign(Algorithm.HMAC256(jwtConfig.secret))
 
-    // ... existing code ...
-
     suspend fun customValidator(credential: JWTCredential): UserPrincipal? {
         val id = credential.payload.getClaim("id").asLong()
         return if (audienceMatches(credential) && id != null) {
@@ -58,6 +56,4 @@ class JwtService(
 
     private fun audienceMatches(credential: JWTCredential): Boolean =
         credential.payload.audience.contains(jwtConfig.audience)
-
-    // ... existing code ...
 }

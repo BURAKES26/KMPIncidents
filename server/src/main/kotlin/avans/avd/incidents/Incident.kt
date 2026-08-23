@@ -56,16 +56,6 @@ data class Incident(
 
     fun isReportedByCurrentUser(userID: Long?): Boolean = userID != null && !isAnonymous && reportedBy == userID
 
-    fun isCoordinateInArea(latMin: Double, latMax: Double, lngMin: Double, lngMax: Double): Boolean {
-        return latitude in latMin..latMax && longitude in lngMin..lngMax
-    }
-
-    fun isDueOrOverdue(): Boolean {
-        val now = currentInstant()
-        return !isResolved && now >= dueAt
-    }
-
-
     companion object {
         val NEW_INCIDENT_ID = 0L
     }

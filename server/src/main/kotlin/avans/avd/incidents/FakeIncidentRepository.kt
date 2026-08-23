@@ -8,7 +8,6 @@ import kotlin.time.Duration.Companion.days
 object FakeIncidentRepository : BaseInMemoryRepository<Incident>(), IncidentRepository<Long> {
     override val items = mutableListOf<Incident>()
     override var currentId: Long = 0L
-    private var imageId: Long = 0L
 
     override fun copyWithNewId(entity: Incident, id: Long): Incident = entity.copy(id = id)
     override fun getId(entity: Incident): Long = entity.id
@@ -174,12 +173,4 @@ object FakeIncidentRepository : BaseInMemoryRepository<Incident>(), IncidentRepo
     // IncidentRepository-specific functionality:
     override suspend fun findIncidentsForUser(userID: Long): List<Incident> =
         items.filter { it.reportedBy == userID }
-
-    override suspend fun findIncidentsInBoundingBox(
-        latMin: Double,
-        latMax: Double,
-        lngMin: Double,
-        lngMax: Double
-    ): List<Incident> = items.filter { it.isCoordinateInArea(latMin, latMax, lngMin, lngMax) }
-
 }

@@ -2,7 +2,6 @@ package avans.avd.utils
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -29,16 +28,3 @@ fun Instant.toDefaultLocalDateTime(): LocalDateTime {
     return this.toLocalDateTime(defaultTimeZone())
 }
 
-/**
- * Converts a LocalDateTime to an Instant using the default timezone.
- */
-fun LocalDateTime.toDefaultInstant(): Instant {
-    return this.toInstant(defaultTimeZone())
-}
-
-/**
- * Gets the current time as a LocalDateTime in the default timezone.
- */
-fun currentLocalDateTime(): LocalDateTime {
-    return currentInstant().toDefaultLocalDateTime()
-}
