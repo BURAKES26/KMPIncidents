@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -53,7 +54,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.example.kmpincidents.generated.resources.*
-import com.example.kmpincidents.*
 import com.example.kmpincidents.data.model.Role
 import com.example.kmpincidents.data.model.Status
 import com.example.kmpincidents.navigation.*
@@ -171,6 +171,7 @@ private fun MyIncidentListContent(
                             )
                         )
                     )
+                    .statusBarsPadding()
                     .padding(20.dp)
             ) {
                 Row(

@@ -74,6 +74,18 @@ kotlin {
         wasmJsMain {
             dependsOn(webMain)
         }
+        val webTest = create("webTest") {
+            dependsOn(commonTest.get())
+            dependencies {
+                implementation(libs.kotlinx.coroutinesTest)
+            }
+        }
+        jsTest {
+            dependsOn(webTest)
+        }
+        wasmJsTest {
+            dependsOn(webTest)
+        }
         val iosMain = create("iosMain") {
             dependsOn(commonMain.get())
         }

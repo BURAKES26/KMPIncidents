@@ -18,7 +18,7 @@ fun main() {
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "KMPIncidents — Official Desktop",
+            title = "KMPIncidents — Desktop",
             state = rememberWindowState(
                 width = 1280.dp,
                 height = 800.dp,

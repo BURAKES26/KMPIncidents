@@ -8,6 +8,8 @@ import avans.avd.incidents.IncidentService
 import avans.avd.incidents.incidentsModule
 import avans.avd.users.FakeUserRepository
 import avans.avd.users.UserService
+import avans.avd.users.usersModule
+import configureStatusPages
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -30,10 +32,14 @@ fun Application.installTestModules() {
         userService
     )
 
+    // Same error handling as the real application, so tests see the correct status codes
+    configureStatusPages()
+
     install(ContentNegotiation) { json() }
     install(SSE)
 
     // Install routes and security commonly needed by tests
     authModule(jwtService)
     incidentsModule(incidentService)
+    usersModule(userService, incidentService)
 }
